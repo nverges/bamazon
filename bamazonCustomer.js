@@ -22,9 +22,7 @@ connection.connect(function(err) {
 
   // displays id connected and welcome message
   console.log("connected as id " + connection.threadId);
-  console.log("-------------------");
-  console.log("Welcome to Bamazon!");
-  console.log("-------------------");
+  console.log("------------------- WELCOME TO BAMAZON! -----------------------");
 
   // display product list
   displayProducts();
@@ -37,6 +35,7 @@ function displayProducts() {
     if (err) throw err;
 
     // logs out table using console.table npm package - really pretty
+    console.log('    ------------------ Current Stock ----------------------');
     console.table(res);
 
     // begins inquirer prompt
@@ -77,8 +76,7 @@ function askQuestions() {
                 if (error) throw error;
 
                 // recap of the item being adjusted 
-                console.log(`You chose: ${data[0].stock_quantity} ${data[0].product_name}(s)`);
-                console.table(data[0]);
+                console.log(`You chose: ${data[0].stock_quantity} ${data[0].product_name}(s) at $${data[0].price} each for a total of $${data[0].price * response.itemQuantity}.`);
 
                 // inserts user input into function to calculate stock availability
                 checkStock(data, response.itemQuantity);
@@ -113,17 +111,22 @@ function checkStock(data, quantity) {
             stock_quantity: quantityLeft
           },
           {
-            item_id: data[0]
+            item_id: data[0].item_id
           }
         ], 
         function (err, results) {
-          console.log("RESULTS: " + results);
+
+          // error checking
+          if (err) throw err;
+
+          // logs returned data
+          // console.log("RESULTS: " + results);
         });
   };
     console.log('-----------------------------');
     console.log(`Quantity Left: ${quantityLeft}`); 
     // updateDB();
-    // displayProducts(); 
+    displayProducts(); 
 };
 
 // updateStock();
@@ -140,7 +143,12 @@ function updateStock(data, quantity) {
       }
     ], 
     function (err, res) {
-      console.log("RESULTS" + res);
+
+      // error checking
+      if (err) throw err;
+
+      // logs returned data
+      // console.log("RESULTS" + res);
     }
   );
 };
