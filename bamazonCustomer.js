@@ -1,3 +1,4 @@
+'use strict'
 // input validation. display error if invalid input
 
 var mysql = require("mysql");
@@ -35,16 +36,16 @@ function displayProducts() {
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
 
-    // logs out table - really pretty
+    // logs out table using console.table npm package - really pretty
     console.table(res);
 
-    // 
+    // begins inquirer prompt
     askQuestions();
   });
 
 };
 
-// inquirer function that takes in user input about item and quantity
+// inquirer function that takes in item and quantity info
 function askQuestions() {
   inquirer
     .prompt([
@@ -67,13 +68,19 @@ function askQuestions() {
       // amount selected
       var amount = response.itemQuantity;
 
+        // mysql query to pull the selected item object
         connection.query("SELECT * FROM products WHERE ?",
             [{ id: item, }],
             function (error, data) {
+
+                // error checking
                 if (error) throw error;
 
+                // recap of the item being adjusted 
                 console.log(`You chose: ${data[0].stock_quantity} ${data[0].product_name}(s)`);
-                console.table(data[0])
+                console.table(data[0]);
+
+                // inserts user input into function to calculate stock availability
                 checkStock(data, response.itemQuantity);
 
              });
@@ -81,9 +88,10 @@ function askQuestions() {
 };
 
 
+// calculates item availability
 function checkStock(data, quantity) {
 
-  // inventory calculation
+  // inventory adjustment
   var quantityLeft =  data[0].stock_quantity - quantity;
 
   // if the input amount is less than the available stock --
@@ -91,7 +99,7 @@ function checkStock(data, quantity) {
       // -- log this error
       console.log("Insufficient Quantity!");
 
-    //otherwise
+    // otherwise
   } else {
 
     // log this success message --
@@ -109,11 +117,28 @@ function checkStock(data, quantity) {
           console.log("RESULTS: " + results);
         });
   };
-      console.log(`Quantity Left: ${quantityLeft}`); 
-      // displayProducts(); 
+    console.log('-----------------------------');
+    console.log(`Quantity Left: ${quantityLeft}`); 
+    updateDB();
+    // displayProducts(); 
+
+
+    //updates the table with new quantity value
+    function updateDB(data, quantity) {
+        var quantity_left = data[0].stock_quantity - quantity;
+        connection.query("UPDATE products SET ? WHERE ?",
+            [
+                { stock_quantity: quantityLeft },
+                { item: data[0].id }
+            ],
+            function (error, data) {
+                if (error) throw error;
+            });
+    };
+
+
+
 };
-
-
 
 // updateStock();
 
