@@ -70,7 +70,7 @@ function askQuestions() {
 
         // mysql query to pull the selected item object
         connection.query("SELECT * FROM products WHERE ?",
-            [{ id: item, }],
+            [{ item_id: item, }],
             function (error, data) {
 
                 // error checking
@@ -111,6 +111,9 @@ function checkStock(data, quantity) {
         [
           { 
             stock_quantity: quantityLeft
+          },
+          {
+            item_id: data[0]
           }
         ], 
         function (err, results) {
@@ -119,25 +122,8 @@ function checkStock(data, quantity) {
   };
     console.log('-----------------------------');
     console.log(`Quantity Left: ${quantityLeft}`); 
-    updateDB();
+    // updateDB();
     // displayProducts(); 
-
-
-    //updates the table with new quantity value
-    function updateDB(data, quantity) {
-        var quantity_left = data[0].stock_quantity - quantity;
-        connection.query("UPDATE products SET ? WHERE ?",
-            [
-                { stock_quantity: quantityLeft },
-                { item: data[0].id }
-            ],
-            function (error, data) {
-                if (error) throw error;
-            });
-    };
-
-
-
 };
 
 // updateStock();
