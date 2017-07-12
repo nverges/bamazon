@@ -16,7 +16,7 @@ CREATE TABLE products (
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES 
 	("Macbook Pro", "Apple", 1200, 5),
-	("Mountain Bike", "Scott", 1500, 2),
+	("Mountain Bike", "Scott", 1500, 150),
 	("Road Bike", "Schwinn", 500, 100),
 	("Dirt Bike", "Yamaha", 1500, 200),
 	("Snowboard", "Never Summer", 750, 125),

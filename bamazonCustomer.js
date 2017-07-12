@@ -1,10 +1,12 @@
 'use strict'
 // input validation. display error if invalid input
 
-var mysql = require("mysql");
-let inquirer = require('inquirer');
+// require packages
+const mysql = require("mysql");
+const inquirer = require('inquirer');
 require("console.table");
 
+// creates mysql connection
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -17,6 +19,8 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
+
+// initializes connection to database
 connection.connect(function(err) {
   if (err) throw err;
 
@@ -123,15 +127,45 @@ function checkStock(data, quantity) {
           // console.log("RESULTS: " + results);
         });
   };
-    console.log('-----------------------------');
-    console.log(`Quantity Left: ${quantityLeft}`); 
-    // updateDB();
-    displayProducts(); 
+
+    // if statement to determine if there's any stock remaining 
+    if (quantityLeft >= 0) {
+        console.log('-----------------------------');
+        console.log(`Quantity Left: ${quantityLeft}`); 
+      displayProducts();
+    } else {
+      console.log('Cannot complete this transaction. Sucks to be you.');
+      buyItem();
+    }
+
+    // updateStock();
+    // displayProducts(); 
 };
 
-// updateStock();
+
+// function that prompts user whether or not to purchase another item
+function buyItem() {
+    inquirer
+    .prompt([
+      {
+        type: "confirm",
+        message: "Would you like to purchase another item?",
+        name: "anotherItem"
+      }
+    ])
+    .then (function(response) {
+        if (response.anotherItem === "y" || "yes") {
+          displayProducts();
+        } else if (response.anotherItem === "n" || "no" ) {
+          console.log('Awww, ok. Thank you for choosing Bamazon!');
+        };
+    });
+};
 
 
+
+
+// not functioning becuase of scoping issues//////
 function updateStock(data, quantity) {
     var quantityLeft =  data[0].stock_quantity - quantity;
 
@@ -152,10 +186,3 @@ function updateStock(data, quantity) {
     }
   );
 };
-
-
-function placeOrder() {
-
-}
-
-
